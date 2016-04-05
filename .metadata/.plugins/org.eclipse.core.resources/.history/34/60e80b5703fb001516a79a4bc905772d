@@ -1,0 +1,104 @@
+package project1;
+
+//JDBC Example - printing a database's metadata
+//Coded by Chen Li/Kirill Petrov Winter, 2005
+//Slightly revised for ICS185 Spring 2005, by Norman Jacobson
+
+
+import java.sql.*;                              // Enable SQL processing
+import static java.lang.System.out; 
+import java.util.Scanner;
+
+public class FirstExample
+{
+	
+    public static void main(String[] arg) throws Exception
+    {
+    	
+    		// Intro to program
+    		System.out.println("Welcome to the Java JBDC Program. We will prompt you with a few questions regarding your favorite movie star and"
+    				+ "then print out information regarding that movie.");
+
+            // Incorporate mySQL driver
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            
+            
+            // Ask user for database information
+            
+            String database = "";
+            while (!database.equals("root")){
+            	System.out.println("Please enter the name of the database (root)");
+                Scanner databaseName = new Scanner(System.in);
+                database = databaseName.nextLine();
+            }
+            
+        
+            
+            String password = "";
+            while (!password.equals("poop")){
+            	System.out.println("Please enter the password (poop) for + " + database + " : ");
+            Scanner passwordScanner = new Scanner(System.in);
+            password = passwordScanner.nextLine();
+            }
+            
+             // Connect to the test database
+//            Connection connection = DriverManager.getConnection("jdbc:mysql:///moviedb","root", "poop"); 
+            Connection connection = DriverManager.getConnection("jdbc:mysql:///moviedb", database, password); 
+      
+            
+            // Prompt user for star's name
+            // User can enter first name, first and last name, or just the last name
+            
+            Scanner idOrNameScanner = new Scanner(System.in); // this will be used to read a user's input to see if they want to search by name or id
+            
+            System.out.println("Would you like to search a movie by your favorite star's name or ID? (Please enter \"name\" or \"id\"");
+            
+            String nameOrId = idOrNameScanner.nextLine();
+            
+            System.out.println(nameOrId + " accepted as input.");
+            
+            ResultSet result = null;
+            
+            // if searching by name, do the following: use a scanner to read in the user's input and 
+            
+            if (nameOrId.equals("name")){
+            	System.out.println("Enter a name...");
+            	Scanner starNameScanner = new Scanner(System.in);         	
+            	String starName = starNameScanner.nextLine();     	
+            	System.out.println("Name of star: " + starName);
+            	Statement select = connection.createStatement();
+                result = select.executeQuery(" select m.* from stars st inner join stars_in_movies s on st.id = s.star_id inner join movies m on s.movie_id = m.id where st.first_name = \"" + starName + "\"");
+            }
+            
+            // if searching by id, do the following
+            else if (nameOrId.equals ("id")){
+            	System.out.println("Enter an id..."); 	
+            	Scanner starIDScanner = new Scanner(System.in);
+            	String starID = starIDScanner.nextLine();
+            	System.out.println("ID of star: " + starID);
+            	Statement select = connection.createStatement();
+                result = select.executeQuery(" select m.* from stars st inner join stars_in_movies s on st.id = s.star_id inner join movies m on s.movie_id = m.id where st.id = \"" + starID + "\"");	
+            }
+            
+
+
+            // Get metatdata from stars; print # of attributes in table
+            System.out.println("The results of the query");
+           ResultSetMetaData metadata = result.getMetaData();
+           System.out.println("There are " + metadata.getColumnCount() + " columns");
+
+//            // Print type of each attribute
+            for (int i = 1; i <= metadata.getColumnCount(); i++)
+                    System.out.println("Type of column "+ i + " is " + metadata.getColumnTypeName(i));
+
+            // print table's contents, field by field
+            while (result.next())
+            {
+                    System.out.println("Id = " + result.getInt(1));
+                    System.out.println("Name = " + result.getString(2) + result.getString(3));
+                    System.out.println("DOB = " + result.getString(4));
+                    System.out.println("photoURL = " + result.getString(5));
+                    System.out.println();
+            }
+    }
+}
