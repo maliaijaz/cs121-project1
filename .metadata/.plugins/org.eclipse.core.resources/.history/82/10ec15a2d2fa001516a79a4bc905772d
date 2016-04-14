@@ -1,0 +1,71 @@
+package project1;
+
+//JDBC Example - printing a database's metadata
+//Coded by Chen Li/Kirill Petrov Winter, 2005
+//Slightly revised for ICS185 Spring 2005, by Norman Jacobson
+
+
+import java.sql.*;                              // Enable SQL processing
+import static java.lang.System.out; 
+import java.util.Scanner;
+
+public class FirstExample
+{
+	
+    public static void main(String[] arg) throws Exception
+    {
+
+            // Incorporate mySQL driver
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            
+
+             // Connect to the test database
+            Connection connection = DriverManager.getConnection("jdbc:mysql:///moviedb","root", "poop");
+            
+            // Prompt user to enter: search by name or ID?
+            // If ID, execute the following statement...
+//            select m.* from stars st inner join stars_in_movies s
+//            on st.id = s.star_id inner join movies m on s.movie_id = m.id 
+            
+            // Prompt user for star's name
+            // User can enter first name, first and last name, or just the last name
+            
+            String searchQuery = "";
+            
+         // Allows a person to enter his/her name   
+            Scanner idOrName = new Scanner(System.in);
+            Scanner one = new Scanner(System.in);
+            System.out.println("Enter Name:" );  
+            String name = one.nextLine();
+            System.out.println("Name accepted " + name);
+          
+
+           
+            
+            
+
+            // Create an execute an SQL statement to select all of table"Stars" records
+            Statement select = connection.createStatement();
+            ResultSet result = select.executeQuery("Select * from stars where id = 872006");
+            
+
+            // Get metatdata from stars; print # of attributes in table
+//            System.out.println("The results of the query");
+//            ResultSetMetaData metadata = result.getMetaData();
+//            System.out.println("There are " + metadata.getColumnCount() + " columns");
+
+//            // Print type of each attribute
+//            for (int i = 1; i <= metadata.getColumnCount(); i++)
+//                    System.out.println("Type of column "+ i + " is " + metadata.getColumnTypeName(i));
+
+            // print table's contents, field by field
+            while (result.next())
+            {
+                    System.out.println("Id = " + result.getInt(1));
+                    System.out.println("Name = " + result.getString(2) + result.getString(3));
+//                    System.out.println("DOB = " + result.getString(4));
+//                    System.out.println("photoURL = " + result.getString(5));
+//                    System.out.println();
+            }
+    }
+}
